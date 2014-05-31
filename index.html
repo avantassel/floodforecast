@@ -40,26 +40,33 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="#">Overview</a></li>
-            <li><a href="#">Reports</a></li>
-            <li><a href="#">Analytics</a></li>
-            <li><a href="#">Export</a></li>
+            <li class="active"><a href="#">Alerts<span class="badge">42</span></a></li>            
           </ul>
           <ul class="nav nav-sidebar">
-            <li><a href="">Nav item</a></li>
-            <li><a href="">Nav item again</a></li>
-            <li><a href="">One more nav</a></li>
-            <li><a href="">Another nav item</a></li>
-            <li><a href="">More navigation</a></li>
-          </ul>
+            <li><a href="">Floods</a></li>
+            <li><a href="">Fires</a></li>
+            <li><a href="">Disaster Centers</a></li>
+          </ul>   
           <ul class="nav nav-sidebar">
-            <li><a href="">Nav item again</a></li>
-            <li><a href="">One more nav</a></li>
-            <li><a href="">Another nav item</a></li>
-          </ul>
+            <li><a href="">{{phone}}</a></li>
+            <li><a href="">{{address}}</a></li>
+          </ul>        
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h1 class="page-header">Flood Forecast</h1>
+            <div ng-show="forecast" class="alert alert-dismissable alert-danger">{{forecast}}<button type="button" class="close" data-dismiss="alert">×</button></div>
+            <div ng-show="altitude" class="alert alert-info">You are {{altitude}} high</div>
+            
+            <form ng-submit="saveUser()">
+            <div class="input-group">
+                <input type="text" class="form-control in-phone" placeholder="Enter your mobile phone for alerts..." ng-model="phone" required>
+                <input type="text" class="form-control hide in-address" placeholder="Enter your address..." ng-model="address">
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="submit" >{{signup}}</button>
+                </span>
+              </div>
+            </form>
+            <br/>
 
             <div id="map"></div>
 
@@ -72,5 +79,6 @@
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/jquery.geolocation.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
 </html>
