@@ -28,7 +28,10 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
     });
 
     $scope.flood = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/ArcGIS/rest/services/Dissolve%20Boulder%20floodplain/FeatureServer/0");
-    $scope.houses = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/floody_houses/FeatureServer/0");
+    $scope.houses = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/new_floody_houses/FeatureServer/0/",
+      {
+        outFields: ["*"]
+      });
     $scope.houses.setSelectionSymbol(new SimpleMarkerSymbol({
       "color": [255,128,128,128],
       "size": 12,
@@ -56,19 +59,6 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
               console.log(results);
           });
       });
-      if ( $scope.houses.hasOwnProperty("fields") ) {
-        console.log("got some fields");
-        
-        var fieldInfo, pad;
-          pad = dojoString.pad;
-
-        fieldInfo = array.map($scope.houses.fields, function(f) {
-          return pad("Field:", 8, " ", true) + pad(f.name, 25, " ", true) + 
-            pad("Alias:", 8, " ", true) + pad(f.alias, 25, " ", true) + 
-            pad("Type:", 8, " ", true) + pad(f.type, 25, " ", true);
-        });
-        console.log(fieldInfo.join("\n"));
-      }
     });
 
 
