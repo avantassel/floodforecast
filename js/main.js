@@ -56,7 +56,12 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
           $scope.houses.selectFeatures($scope.query2, FeatureLayer.SELECTION_NEW, function(results){
               // returning FID for matching items
               $scope.badHouses = results;
-              console.log(results);
+
+              // Loop through results and send text message
+              array.forEach(results, function(entry, i){
+                sendAlert(entry.attributes.phone);
+              });
+
           });
       });
     });
@@ -64,6 +69,15 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
 
 
   });
+
+  function sendAlert(phoneNum) {
+    $.ajax({
+      type: "GET",
+      url: 'sendAlert.php',
+      data: { 'phone': phoneNum },
+      success: alert("sent")
+    });
+  }
 
   $scope.hasAlert = function(){
     switch($scope.score){
