@@ -12,11 +12,11 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
   $scope.when = [];
   $scope.forecast = "No rain in the forecast";
   $scope.altitude;
-  $scope.address;
-  $scope.phone;
-  $scope.address;
-  $scope.user_id;
-  $scope.email;  
+  $scope.address='';
+  $scope.phone='';
+  $scope.address='';
+  $scope.user_id='';
+  $scope.email='';  
   $scope.signup = "Sign Up";
 
   require(["esri/symbols/SimpleMarkerSymbol", "dojo/_base/array", "dojo/string", "esri/tasks/QueryTask", "esri/tasks/query", "esri/map", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "dojo/domReady!"], 
@@ -97,16 +97,18 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
 
       $scope.signup = "Saving...";
 
-      var args = {"geometry":{"x":$scope.location[1],"y":$scope.location[1]},"phone":$scope.phone};
+      var args = {"geometry":{"x":$scope.location[1],"y":$scope.location[0]},"attributes":{"phone":$scope.phone,"email":$scope.email}};
 
       if($scope.address)
         args.address = $scope.address;
 
-      $http.post('post.php', args).then(function(response){
-        $scope.user_id = response.id;
-        $scope.signup = "Change Address";
-        $('.in-phone').hide();
-        $('.in-address').show();
+      $http.post('save.php', args).then(function(response){     
+        if(response.data.addResults && response.data.addResults.length != 0){
+          $scope.user_id = response.data.addResults[0].objectId;
+          $scope.signup = "Change Address";
+          $('.in-phone').addClass('hide');
+          $('.in-address').removeClass('hide').focus();
+        }
       },function(){
         //failed posting
         $scope.signup = "Sign Up";
@@ -118,21 +120,21 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
 
       geoCodeAddress().then(function(){
         // success
-        var args = {"geometry":{"x":$scope.location[1],"y":$scope.location[1]},"attributes":{"phone":$scope.phone,"email":$scope.email}};
+        var args = {"geometry":{"x":$scope.location[1],"y":$scope.location[0]},"attributes":{"phone":$scope.phone,"email":$scope.email}};
 
         if($scope.user_id)
-          args.attributes.objectid = $scope.user_id;
+          args.attributes.FID = $scope.user_id;
 
         if($scope.address)
-          args.address = $scope.address;
+          args.attributes.address = $scope.address;
 
-        $http.post('post.php', args).then(function(response){
+        $http.post('update.php', args).then(function(response){
 
-          if(response.addResults && response.addResults.length != 0){
-            $scope.user_id = response.addResults[0].objectId;
+          if(response.data.addResults && response.data.addResults.length != 0){
+            $scope.user_id = response.data.addResults[0].objectId;
             $scope.signup = "Sign Up";
-            $('.in-phone').show();
-            $('.in-address').hide();
+            $('.in-phone').removeClass('hide');
+            $('.in-address').addClass('hide');
           }
         },function(){
           //failed posting
@@ -146,14 +148,16 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
     }
   };
 
-  function geoCodeAddress(address){
+  function geoCodeAddress(){
     
     var deferred = $q.defer();
 
-    $http.jsonp('http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&outSR=102100&text='+address+'&callback=JSON_CALLBACK',{timeout: 10000}).then(function(response){
+    $http.jsonp('http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text='+$scope.address+'&callback=JSON_CALLBACK',{timeout: 10000}).then(function(response){
 
-           if(response.locations.length != 0 ){
-            $scope.location = [response.locations[0].feature.geometry.y, response.locations[0].feature.geometry.x];
+            console.log(response.data.locations[0].feature.geometry);
+
+           if(response.data.locations && response.data.locations.length != 0 ){
+            $scope.location = [response.data.locations[0].feature.geometry.x, response.data.locations[0].feature.geometry.y];
             updateMap();
             deferred.resolve( );
            } else {
