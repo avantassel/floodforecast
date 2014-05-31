@@ -28,14 +28,18 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
     });
 
     $scope.flood = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/ArcGIS/rest/services/Dissolve%20Boulder%20floodplain/FeatureServer/0");
-    $scope.houses = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/floody_houses/FeatureServer/0");
+    $scope.centres = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/Evacuation_Centers/FeatureServer/0/");
+    $scope.houses = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/new_floody_houses/FeatureServer/0/",
+      {
+        outFields: ["*"]
+      });
     $scope.houses.setSelectionSymbol(new SimpleMarkerSymbol({
       "color": [255,128,128,128],
       "size": 12,
       "style": "esriSMSCircle"
     }));
 
-    $scope.map.addLayers([$scope.flood,$scope.houses]);
+    $scope.map.addLayers([$scope.flood,$scope.houses,$scope.centres]);
 
     // once both layers are loaded
     $scope.map.on("layers-add-result", function() {
@@ -53,27 +57,28 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
           $scope.houses.selectFeatures($scope.query2, FeatureLayer.SELECTION_NEW, function(results){
               // returning FID for matching items
               $scope.badHouses = results;
-              console.log(results);
+
+              // Loop through results and send text message
+              array.forEach(results, function(entry, i){
+                sendAlert(entry.attributes.phone);
+              });
+
           });
       });
-      if ( $scope.houses.hasOwnProperty("fields") ) {
-        console.log("got some fields");
-        
-        var fieldInfo, pad;
-          pad = dojoString.pad;
-
-        fieldInfo = array.map($scope.houses.fields, function(f) {
-          return pad("Field:", 8, " ", true) + pad(f.name, 25, " ", true) + 
-            pad("Alias:", 8, " ", true) + pad(f.alias, 25, " ", true) + 
-            pad("Type:", 8, " ", true) + pad(f.type, 25, " ", true);
-        });
-        console.log(fieldInfo.join("\n"));
-      }
     });
 
 
 
   });
+
+  function sendAlert(phoneNum) {
+    $.ajax({
+      type: "GET",
+      url: 'sendAlert.php',
+      data: { 'phone': phoneNum },
+      success: alert("sent")
+    });
+  }
 
   $scope.hasAlert = function(){
     switch($scope.score){
