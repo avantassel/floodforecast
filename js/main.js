@@ -28,6 +28,7 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
     });
 
     $scope.flood = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/ArcGIS/rest/services/Dissolve%20Boulder%20floodplain/FeatureServer/0");
+    $scope.centres = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/Evacuation_Centers/FeatureServer/0/");
     $scope.houses = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/new_floody_houses/FeatureServer/0/",
       {
         outFields: ["*"]
@@ -38,7 +39,7 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
       "style": "esriSMSCircle"
     }));
 
-    $scope.map.addLayers([$scope.flood,$scope.houses]);
+    $scope.map.addLayers([$scope.flood,$scope.houses,$scope.centres]);
 
     // once both layers are loaded
     $scope.map.on("layers-add-result", function() {
