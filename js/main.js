@@ -332,5 +332,4 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
     locateUser();
   else
      updateMap();
-
 });
