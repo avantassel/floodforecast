@@ -8,7 +8,7 @@ $client = new Services_Twilio($account_sid, $auth_token);
 $response  = $client->account->messages->create(array( 
   'To' => $_GET['phone'],
   'From' => "+13039007288", 
-  'Body' => "FloodForecast says: Flooding near you, move to higher ground",   
+  'Body' => "FloodForecast says: Flooding near you, move to higher ground. Nearest evacuation center: 450 Powers St, Erie, CO",   
 ));
 
 header("Content-type: application/json");
