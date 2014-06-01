@@ -11,6 +11,7 @@ $request = $client->createRequest('POST', 'http://services2.arcgis.com/XrTRbkeSS
 $postBody = $request->getBody();
 $postBody->setField('f', 'pjson');
 $postBody->setField('features', $data_string);
+$postBody->setField('outSR', 102100);
 $response = $client->send($request);
 
 header("Content-type: application/json");

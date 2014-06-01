@@ -64,7 +64,10 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter,$l
       
     });
 
-    $scope.sendAlerts = function(){
+    $scope.sendAlerts = function(e){
+
+      var note = $(e.target);
+      note.html('Sending Alerts...');
       // get the polygon feature
       $scope.query1 = new Query();
       $scope.query1.where = "1=1";
@@ -85,10 +88,12 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter,$l
                 // find closest DAC
                 // findDAC(entry);
                 if(entry.attributes.phone){
-                  console.log('alert',entry.attributes.phone);
+                  console.log('Text alert sent to ',entry.attributes.phone);
                   sendAlert(entry.attributes.phone);
+                  note.html('Sending Alerts...'+entry.attributes.phone);
                 }
               });
+              note.html('Disaster Centers');
           });
       });
     };
@@ -239,7 +244,8 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter,$l
       
       $scope.signup = "Saving...";
 
-      var args = {"geometry":{"x":$scope.location[1],"y":$scope.location[0]},"attributes":{"phone":$scope.phone,"email":$scope.email,"address":$scope.address}};
+      var mll = llToMercator($scope.location[1],$scope.location[0]);
+      var args = {"geometry":{"x":mll[0],"y":mll[1]},"attributes":{"phone":$scope.phone,"email":$scope.email,"address":$scope.address}};
       var save_url = 'save.php';
 
       //update the user record if we have their ID
@@ -291,9 +297,6 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter,$l
     
   };
 
-  $scope.getWeatherIcon = function(){
-
-  }
   function geoCodeAddress(){
     
     var deferred = $q.defer();
@@ -345,6 +348,21 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter,$l
             }
       });        
   }
+
+  function llToMercator(lat,lon) {
+    //code completely borrowed from Dr Bill Hazelton's HP-33S calculator
+    // http://homepage.mac.com/nwjh/HP-33S/ 10-Feb-10
+
+      var num = lon * 0.017453292519943295;
+      var x = 6378137.0 * num;
+      var a = lat * 0.017453292519943295;
+
+      var mercatorX = x;
+      var mercatorY = 3189068.5*Math.log((1.0 + Math.sin(a))/(1.0 - Math.sin(a)));
+
+
+    return [mercatorX,mercatorY];
+    }
 
   $scope.getTime = function(time){
       //time is epoch in seconds
