@@ -1,8 +1,9 @@
 angular.module('floodforecast', ['ngCookies','angular-loading-bar']).
-config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
+config(function(cfpLoadingBarProvider,$locationProvider) {
     cfpLoadingBarProvider.includeSpinner = false;
-  }]).
-controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
+    $locationProvider.html5Mode(true).hashPrefix('!');
+  }).
+controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter,$location) {
 
   var usergraphic;
 
@@ -30,7 +31,7 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
    
     $scope.map = new Map("map", {
       center: $scope.location,
-      zoom: 13,
+      zoom: 12,
       basemap: "streets"
     });
 
@@ -60,6 +61,10 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
     // once both layers are loaded
     $scope.map.on("layers-add-result", function() {
       
+      
+    });
+
+    $scope.sendAlerts = function(){
       // get the polygon feature
       $scope.query1 = new Query();
       $scope.query1.where = "1=1";
@@ -78,15 +83,15 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
               array.forEach(results, function(entry, i){
 
                 // find closest DAC
-                findDAC(entry);
-
+                // findDAC(entry);
+                if(entry.attributes.phone){
+                  console.log('alert',entry.attributes.phone);
+                  sendAlert(entry.attributes.phone);
+                }
               });
           });
       });
-    });
-
-
-
+    };
   
     function findDAC(userLocation) {
       // $scope.centres
@@ -163,12 +168,15 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
 
   }); //end of esri
 
-  function sendAlert() {
+  function sendAlert(phone) {
+
+    if(!phone)
+      phone=$scope.phone;
 
     $.ajax({
       type: "GET",
       url: 'sendAlert.php',
-      data: { 'phone': $scope.phone, 'dac': $scope.dac },
+      data: { 'phone': phone, 'dac': $scope.dac },
       success: function(){
        console.log('sentAlert','Alert sent to '+$scope.phone) 
       }
@@ -385,6 +393,8 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
 
   function updateMap(){
 
+    $timeout(function(){      
+
     var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point($scope.location[0], $scope.location[1]));
         if (!usergraphic) {
           var symbol = new esri.symbol.PictureMarkerSymbol('images/bluedot.png', 40, 40);
@@ -397,6 +407,8 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
         $scope.map.centerAt(pt);
 
         getForecast();
+
+      },1000);
   }
 
   function locateUser(){
