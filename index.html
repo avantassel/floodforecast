@@ -50,7 +50,7 @@
           </ul>  
 
           <ul class="nav nav-sidebar">
-            <li ng-repeat="forecast in hourlyforecast"><a href="#">{{forecast.temperature}}&deg;F {{ forecast.time | date : 'h:mm a'}}</a></li>
+            <li ng-repeat="forecast in hourlyforecast"><a href="#">{{forecast.temperature}}&deg;F {{forecast.time | date:'h:mm a'}}</a></li>
           </ul>      
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
@@ -58,7 +58,7 @@
             <div ng-show="hourlyforecastsummary" class="alert alert-info alert-dismissable"><strong>Forecast:</strong> {{hourlyforecastsummary}} ...<a ng-href="http://forecast.io/#/f/{{location[1]}},{{location[0]}}" target="_blank">forecast.io</a><button type="button" class="close" data-dismiss="alert">×</button></div>
             <div ng-show="altitude" class="alert alert-info">You are {{altitude}} high</div>
             
-            <form ng-submit="saveUser()">              
+            <form ng-submit="saveUser()" id="frmUser">              
             <div class="input-group">
                 <input type="phone" class="form-control in-phone" placeholder="Enter your mobile phone for txt alerts..." ng-model="phone" required>
                 <input type="text" class="form-control in-address" placeholder="Enter your address..." ng-model="address">
