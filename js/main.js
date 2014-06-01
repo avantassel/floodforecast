@@ -19,16 +19,30 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
   $scope.email='';  
   $scope.signup = "Sign Up";
 
-  require(["esri/symbols/SimpleMarkerSymbol", "dojo/_base/array", "dojo/string", "esri/tasks/QueryTask", "esri/tasks/query", "esri/map", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "dojo/domReady!"], 
-   function(SimpleMarkerSymbol, array, dojoString, QueryTask, Query, Map, ArcGISDynamicMapServiceLayer, FeatureLayer) { 
+  require(["esri/urlUtils", "esri/tasks/FeatureSet","esri/tasks/ClosestFacilityTask", "esri/tasks/ClosestFacilityParameters", "esri/symbols/SimpleMarkerSymbol", "dojo/_base/array", "dojo/string", "esri/tasks/QueryTask", "esri/tasks/query", "esri/map", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "dojo/domReady!"], 
+   function(urlUtils, FeatureSet, ClosestFacilityTask, ClosestFacilityParameters, SimpleMarkerSymbol, array, dojoString, QueryTask, Query, Map, ArcGISDynamicMapServiceLayer, FeatureLayer) { 
     $scope.map = new Map("map", {
       center: $scope.location,
       zoom: 13,
       basemap: "streets"
     });
 
+    urlUtils.addProxyRule({
+      urlPrefix: "route.arcgis.com",  
+      proxyUrl: "/sproxy"
+    });
+
+
     $scope.flood = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/ArcGIS/rest/services/Dissolve%20Boulder%20floodplain/FeatureServer/0");
-    $scope.centres = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/Evacuation_Centers/FeatureServer/0/");
+    $scope.centres = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/Evacuation_Centers/FeatureServer/0/", {
+      mode: FeatureLayer.MODE_SNAPSHOT,
+      outFields: ["*"]
+    });
+    // need to query the feature layer
+
+    // result if a featuresetresult
+
+    //facilities.features = featuresetresult.graphics;
     $scope.houses = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/new_floody_houses/FeatureServer/0/",
       {
         outFields: ["*"]
@@ -41,9 +55,19 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
 
     $scope.map.addLayers([$scope.flood,$scope.houses,$scope.centres]);
 
-    // once both layers are loaded
+    $scope.centres.on("load", function(evt) {
+      $scope.query3 = new Query();
+      $scope.query3.where = "1=1";
+      $scope.centres.queryFeatures($scope.query3, function(results){
+        console.log(results);
+        $scope.facilities = new esri.tasks.FeatureSet();
+        $scope.facilities.features = results.features;
+      });
+    });
+
+    // once a layer is loaded
     $scope.map.on("layers-add-result", function() {
-      
+
       // get the polygon feature
       $scope.query1 = new Query();
       $scope.query1.where = "1=1";
@@ -60,6 +84,10 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
 
               // Loop through results and send text message
               array.forEach(results, function(entry, i){
+                console.log(entry);
+                // find closest DAC
+                findDAC(entry.geometry);
+
                 // off for now
                 // sendAlert(entry.attributes.phone);
               });
@@ -68,6 +96,31 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
       });
     });
   });
+
+  function findDAC(userLocation) {
+    $scope.centres
+    userLocation
+
+    var params = new esri.tasks.ClosestFacilityParameters();
+    params.defaultCutoff = 3.0;
+    params.returnIncidents = false;
+    params.returnRoutes = true;
+    params.returnDirections = true;
+    params.facilities = $scope.facilities; // needs to be a DataFile
+    
+
+    $scope.incidents = new esri.tasks.FeatureSet();
+    $scope.incidents.features = userLocation;
+    params.incidents = $scope.incidents;
+
+    
+
+    closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://route.arcgis.com/arcgis/rest/services/World/ClosestFacility/NAServer/ClosestFacility_World");
+
+    closestFacilityTask.solve(params, function(solveResult){
+      console.log(solveResult);
+    });
+  }
 
   function sendAlert(phoneNum) {
     $.ajax({
