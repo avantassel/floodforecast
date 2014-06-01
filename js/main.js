@@ -28,10 +28,10 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
     });
 
 
-    urlUtils.addProxyRule({
-      urlPrefix: "route.arcgis.com",  
-      proxyUrl: "http://floodforecast/PHP/proxy.php"
-    });
+    // urlUtils.addProxyRule({
+    //   urlPrefix: "route.arcgis.com",  
+    //   proxyUrl: "http://floodforecast/PHP/proxy.php"
+    // });
 
 
     $scope.flood = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/ArcGIS/rest/services/Dissolve%20Boulder%20floodplain/FeatureServer/0");
