@@ -60,7 +60,8 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
 
               // Loop through results and send text message
               array.forEach(results, function(entry, i){
-                sendAlert(entry.attributes.phone);
+                // off for now
+                // sendAlert(entry.attributes.phone);
               });
 
           });
