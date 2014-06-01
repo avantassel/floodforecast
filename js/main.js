@@ -20,6 +20,7 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
   $scope.signup = "Sign Up";
   $scope.score = 3;
   $scope.hourlyforecastsummary;
+  $scope.prev_address='';
 
   require(["esri/symbols/SimpleMarkerSymbol", "dojo/_base/array", "dojo/string", "esri/tasks/QueryTask", "esri/tasks/query", "esri/map", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "dojo/domReady!"], 
    function(SimpleMarkerSymbol, array, dojoString, QueryTask, Query, Map, ArcGISDynamicMapServiceLayer, FeatureLayer) { 
@@ -155,21 +156,36 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
     }    
   };
 
-  $scope.saveUser = function(){    
+  $scope.saveUser = function(){ 
 
+        if(!angular.equals($scope.prev_address,$scope.address)){
+          geoCodeAddress().then(function(){
+            $scope.updateUser();            
+          });
+        } else {
+          $scope.updateUser();            
+        }
+  };   
+
+  $scope.updateUser = function(){ 
+      
       $scope.signup = "Saving...";
 
       var args = {"geometry":{"x":$scope.location[1],"y":$scope.location[0]},"attributes":{"phone":$scope.phone,"email":$scope.email,"address":$scope.address}};
       var save_url = 'save.php';
 
-      if(!$scope.user_id && $scope.user_id != '')
+      //update the user record if we have their ID
+      if($scope.user_id && $scope.user_id != ''){
         save_url='update.php';
+        args.attributes.FID = $scope.user_id;        
+      }
 
       $http.post(save_url, args).then(function(response){     
-        if(response.data.addResults && response.data.addResults.length != 0){
-          if(!$scope.user_id && $scope.user_id != '')
+        if(response.data){
+          
+          if(!$scope.user_id || $scope.user_id == '')
             $scope.user_id = response.data.addResults[0].objectId;
-          $scope.signup = "Thanks";     
+
           $cookies.lng = $scope.location[0];
           $cookies.lat = $scope.location[1];
           $cookies.phone = $scope.phone;     
@@ -179,13 +195,13 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
 
           if(!$scope.address || $scope.address==''){
             $('.in-phone').hide();
-            $('.in-address').show();
+            $('.in-address').show().focus();
             $('.in-email').hide();            
           }
-          if(!$scope.email || $scope.email==''){
+          else if(!$scope.email || $scope.email==''){
             $('.in-phone').hide();
             $('.in-address').hide();
-            $('.in-email').show();            
+            $('.in-email').show().focus();            
           }
 
           if($scope.phone && !$cookies.alert_sent){
@@ -209,8 +225,8 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
     $http.jsonp('http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/find?f=pjson&text='+$scope.address+'&callback=JSON_CALLBACK',{timeout: 10000}).then(function(response){
 
             if(response.data.locations && response.data.locations.length != 0 ){
-            $scope.location = [response.data.locations[0].feature.geometry.x, response.data.locations[0].feature.geometry.y];
-            updateMap();
+              $scope.location = [response.data.locations[0].feature.geometry.x, response.data.locations[0].feature.geometry.y];
+              updateMap();
             deferred.resolve( );
            } else {
             deferred.reject( );
@@ -307,7 +323,8 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
     $scope.email = $cookies.email;     
 
   if($cookies.address){
-    $scope.address = $cookies.address;    
+    $scope.address = $cookies.address;   
+    $scope.prev_address = $cookies.address;   
     geoCodeAddress();
   }
 
@@ -319,14 +336,23 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
 
   if(!$scope.address || $scope.address==''){
       $('.in-phone').hide();
-      $('.in-address').show();
+      $('.in-address').show().focus();
       $('.in-email').hide();            
     }
-    if(!$scope.email || $scope.email==''){
+  if(!$scope.email || $scope.email==''){
       $('.in-phone').hide();
       $('.in-address').hide();
-      $('.in-email').show();            
+      $('.in-email').show().focus();            
     }
+  if(!$scope.phone || $scope.phone==''){
+    $('.in-phone').show().focus();
+    $('.in-address').hide();
+    $('.in-email').hide();            
+  }
+
+  if($scope.phone && $scope.email && $scope.address){
+    $('#frmUser').hide();
+  }
 
   if(!$cookies.address || $cookies.address == ''){
     locateUser();    
