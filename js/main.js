@@ -129,8 +129,6 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
 
   });
 
-
-
   function sendAlert() {
 
     $.ajax({
@@ -139,6 +137,18 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
       data: { 'phone': $scope.phone, 'dac': $scope.dac },
       success: function(){
        console.log('sentAlert','Alert sent to '+$scope.phone) 
+      }
+    });
+  }
+
+  function sendEmail() {
+
+    $.ajax({
+      type: "GET",
+      url: 'sendEmail.php',
+      data: { 'to': $scope.email },
+      success: function(){
+       console.log('sendEmail','Email sent to '+$scope.email) 
       }
     });
   }
@@ -207,6 +217,11 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
           if($scope.phone && !$cookies.alert_sent){
             sendAlert();
             $cookies.alert_sent = true;
+          }
+
+          if($scope.email && !$cookies.email_sent){
+            sendEmail();
+            $cookies.email_sent = true;
           }
 
           $scope.signup = "Save";
