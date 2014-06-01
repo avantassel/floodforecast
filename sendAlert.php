@@ -8,7 +8,7 @@ $client = new Services_Twilio($account_sid, $auth_token);
 $client->account->messages->create(array( 
   'To' => $_GET['phone'],
   'From' => "+13039007288", 
-  'Body' => "Your property is in eminent danger of flooding. Please seek shelter immediately. Nearest Disaster Assistance Center: 123 Street Place",   
+  'Body' => "Your property is in eminent danger of flooding. Please seek shelter immediately. Nearest Disaster Assistance Center: " + $_GET['dac'],   
 ));
 ?>
 <!doctype html>
@@ -20,6 +20,6 @@ $client->account->messages->create(array(
     <title>FloodForecast</title>
   </head>
   <body>
-  	Registered with #: <?php echo $_GET["phone"]; ?>.
+  	Registered with #: <?php echo $_GET["phone"]; ?>, near DAC: <?php echo $_GET["dac"]; ?>.
   </body>
 </html>
