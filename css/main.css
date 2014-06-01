@@ -13,6 +13,9 @@ body {
   padding-top: 50px;
 }
 
+.in-address,.in-email{
+  display: none !important;
+}
 
 /*
  * Global add-ons

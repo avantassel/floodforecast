@@ -43,9 +43,9 @@
           </ul>
           <ul class="nav nav-sidebar">
             <form ng-submit="saveUser()">
-            <li><input type="text" class="form-control in-phone" placeholder="Phone" ng-model="phone"></li>
-            <li><input type="text" class="form-control in-email" placeholder="Email" ng-model="email"></li>
-            <li><input type="text" class="form-control in-address" placeholder="Address" ng-model="address"></li>
+            <li><input type="phone" class="form-control in-side-phone" placeholder="Phone" ng-model="phone"></li>
+            <li><input type="email" class="form-control in-side-email" placeholder="Email" ng-model="email"></li>
+            <li><input type="text" class="form-control in-side-address" placeholder="Address" ng-model="address"></li>
             <li>
               <button class="btn btn-default" type="submit" >{{signup}}</button>
             </li>
@@ -57,10 +57,11 @@
             <div ng-show="forecast" class="alert alert-dismissable alert-danger">{{forecast}}<button type="button" class="close" data-dismiss="alert">×</button></div>
             <div ng-show="altitude" class="alert alert-info">You are {{altitude}} high</div>
             
-            <form ng-submit="saveUser()">
+            <form ng-submit="saveUser()">              
             <div class="input-group">
-                <input type="text" class="form-control in-phone" placeholder="Enter your mobile phone for alerts..." ng-model="phone" required>
-                <input type="text" class="form-control hide in-address" placeholder="Enter your address..." ng-model="address">
+                <input type="phone" class="form-control in-phone" placeholder="Enter your mobile phone for txt alerts..." ng-model="phone" required>
+                <input type="text" class="form-control in-address" placeholder="Enter your address..." ng-model="address">
+                <input type="email" class="form-control in-email" placeholder="Enter your email for alerts..." ng-model="email">
                 <span class="input-group-btn">
                   <button class="btn btn-default" type="submit" >{{signup}}</button>
                 </span>

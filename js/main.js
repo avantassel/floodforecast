@@ -19,25 +19,16 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
   $scope.email='';  
   $scope.signup = "Sign Up";
 
-  require(["esri/urlUtils", "esri/tasks/FeatureSet","esri/tasks/ClosestFacilityTask", "esri/tasks/ClosestFacilityParameters", "esri/symbols/SimpleMarkerSymbol", "dojo/_base/array", "dojo/string", "esri/tasks/QueryTask", "esri/tasks/query", "esri/map", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "dojo/domReady!"], 
-   function(urlUtils, FeatureSet, ClosestFacilityTask, ClosestFacilityParameters, SimpleMarkerSymbol, array, dojoString, QueryTask, Query, Map, ArcGISDynamicMapServiceLayer, FeatureLayer) { 
+  require(["esri/symbols/SimpleMarkerSymbol", "dojo/_base/array", "dojo/string", "esri/tasks/QueryTask", "esri/tasks/query", "esri/map", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "dojo/domReady!"], 
+   function(SimpleMarkerSymbol, array, dojoString, QueryTask, Query, Map, ArcGISDynamicMapServiceLayer, FeatureLayer) { 
     $scope.map = new Map("map", {
       center: $scope.location,
       zoom: 13,
       basemap: "streets"
     });
 
-    
     $scope.flood = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/ArcGIS/rest/services/Dissolve%20Boulder%20floodplain/FeatureServer/0");
-    $scope.centres = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/Evacuation_Centers/FeatureServer/0/", {
-      mode: FeatureLayer.MODE_SNAPSHOT,
-      outFields: ["*"]
-    });
-    // need to query the feature layer
-
-    // result if a featuresetresult
-
-    //facilities.features = featuresetresult.graphics;
+    $scope.centres = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/Evacuation_Centers/FeatureServer/0/");
     $scope.houses = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/new_floody_houses/FeatureServer/0/",
       {
         outFields: ["*"]
@@ -50,19 +41,9 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
 
     $scope.map.addLayers([$scope.flood,$scope.houses,$scope.centres]);
 
-    $scope.centres.on("load", function(evt) {
-      $scope.query3 = new Query();
-      $scope.query3.where = "1=1";
-      $scope.centres.queryFeatures($scope.query3, function(results){
-        console.log(results);
-        $scope.facilities = new esri.tasks.FeatureSet();
-        $scope.facilities.features = results.features;
-      });
-    });
-
-    // once a layer is loaded
+    // once both layers are loaded
     $scope.map.on("layers-add-result", function() {
-
+      
       // get the polygon feature
       $scope.query1 = new Query();
       $scope.query1.where = "1=1";
@@ -79,10 +60,6 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
 
               // Loop through results and send text message
               array.forEach(results, function(entry, i){
-                console.log(entry);
-                // find closest DAC
-                findDAC(entry.geometry);
-
                 // off for now
                 // sendAlert(entry.attributes.phone);
               });
@@ -92,37 +69,14 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
     });
   });
 
-  function findDAC(userLocation) {
-    $scope.centres
-    userLocation
-
-    var params = new esri.tasks.ClosestFacilityParameters();
-    params.defaultCutoff = 3.0;
-    params.returnIncidents = false;
-    params.returnRoutes = true;
-    params.returnDirections = true;
-    params.facilities = $scope.facilities; // needs to be a DataFile
-    
-
-    $scope.incidents = new esri.tasks.FeatureSet();
-    $scope.incidents.features = userLocation;
-    params.incidents = $scope.incidents;
-
-    
-
-    closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://route.arcgis.com/arcgis/rest/services/World/ClosestFacility/NAServer/ClosestFacility_World");
-
-    closestFacilityTask.solve(params, function(solveResult){
-      console.log(solveResult);
-    });
-  }
-
-  function sendAlert(phoneNum) {
+  function sendAlert() {
     $.ajax({
       type: "GET",
       url: 'sendAlert.php',
       data: { 'phone': $scope.phone },
-      success: alert("sent")
+      success: function(){
+       console.log('sentAlert','Alert sent to '+$scope.phone) 
+      }
     });
   }
 
@@ -144,30 +98,51 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
   };
 
   $scope.saveUser = function(){
-    if($scope.signup == "Sign Up"){
+    
 
       $scope.signup = "Saving...";
 
-      var args = {"geometry":{"x":$scope.location[1],"y":$scope.location[0]},"attributes":{"phone":$scope.phone,"email":$scope.email}};
+      var args = {"geometry":{"x":$scope.location[1],"y":$scope.location[0]},"attributes":{"phone":$scope.phone,"email":$scope.email,"address":$scope.address}};
+      var save_url = 'save.php';
 
-      if($scope.address)
-        args.address = $scope.address;
+      if(!$scope.user_id && $scope.user_id != '')
+        save_url='update.php';
 
-      $http.post('save.php', args).then(function(response){     
+      $http.post(save_url, args).then(function(response){     
         if(response.data.addResults && response.data.addResults.length != 0){
-          $scope.user_id = response.data.addResults[0].objectId;
+          if(!$scope.user_id && $scope.user_id != '')
+            $scope.user_id = response.data.addResults[0].objectId;
           $scope.signup = "Thanks";     
-          $cookies.location = JSON.stringify($scope.location);
+          $cookies.lng = $scope.location[0];
+          $cookies.lat = $scope.location[1];
           $cookies.phone = $scope.phone;     
           $cookies.email = $scope.email;     
           $cookies.address = $scope.address;  
           $cookies.user_id = $scope.user_id;   
+
+          if(!$scope.address || $scope.address==''){
+            $('.in-phone').hide();
+            $('.in-address').show();
+            $('.in-email').hide();            
+          }
+          if(!$scope.email || $scope.email==''){
+            $('.in-phone').hide();
+            $('.in-address').hide();
+            $('.in-email').show();            
+          }
+
+          if($scope.phone && !$cookies.alert_sent){
+            sendAlert();
+            $cookies.alert_sent = true;
+          }
+
+          $scope.signup = "Save";
         }
       },function(){
         //failed posting
         $scope.signup = "Sign Up";
       });
-    } 
+    
   };
 
   function geoCodeAddress(){
@@ -262,15 +237,39 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
   }
 
   if($cookies.location)
-    $scope.location = JSON.parse($cookies.location);
-  $scope.phone = $cookies.phone;     
-  $scope.email = $cookies.email;     
-  $scope.address = $cookies.address;    
-  $scope.user_id = $cookies.user_id;    
+    $scope.location = [$cookies.lng+','+$cookies.lat];
 
-  // if($scope.location)
+  if($cookies.phone)
+    $scope.phone = $cookies.phone;     
+
+  if($cookies.email)
+    $scope.email = $cookies.email;     
+
+  if($cookies.address)
+    $scope.address = $cookies.address;    
+
+  if($cookies.user_id)
+    $scope.user_id = $cookies.user_id;    
+
+  if($scope.phone)
+    $scope.signup='Save';
+
+  if(!$scope.address || $scope.address==''){
+      $('.in-phone').hide();
+      $('.in-address').show();
+      $('.in-email').hide();            
+    }
+    if(!$scope.email || $scope.email==''){
+      $('.in-phone').hide();
+      $('.in-address').hide();
+      $('.in-email').show();            
+    }
+
+   console.log($cookies);
+          
+  if($scope.location)
     locateUser();
-  // else
-  //   updateMap();
+  else
+     updateMap();
 
 });
