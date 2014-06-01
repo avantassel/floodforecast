@@ -7,6 +7,7 @@
         <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
         <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/esri/css/esri.css">
         <link rel="stylesheet" href="css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="css/weather.css"/>
         <link rel="stylesheet" href="css/main.css"/>
     </head>
     <body ng-controller="AppCtrl">
@@ -36,7 +37,7 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="#">My Alerts</a></li>            
+            <li class="active"><a href="#">My Alerts <span class="label label-warning pull-right" style="color:#000000;"><strong>{{noaaAlerts.length}}</strong></span></a> </li>            
           </ul>
           <ul class="nav nav-sidebar">
             <form ng-submit="saveUser()">
@@ -50,12 +51,12 @@
           </ul>  
 
           <ul class="nav nav-sidebar">
-            <li ng-repeat="forecast in hourlyforecast"><a href="#">{{forecast.temperature}}&deg;F {{forecast.time | date:'h:mm a'}}</a></li>
+            <li ng-repeat="forecast in hourlyforecast"><a href="#"><canvas id="w{{forecast.time}}" width="35" height="35" ></canvas> {{forecast.temperature}}&deg;F <span class="pull-right">{{getTime(forecast.time)}}</span></a></li>
           </ul>      
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Flood Forecast</h1>
-            <div ng-show="hourlyforecastsummary" class="alert alert-info alert-dismissable"><strong>Forecast:</strong> {{hourlyforecastsummary}} ...<a ng-href="http://forecast.io/#/f/{{location[1]}},{{location[0]}}" target="_blank">forecast.io</a><button type="button" class="close" data-dismiss="alert">×</button></div>
+          <h1 class="page-header"><canvas id="logo" width="55" height="55"></canvas> Flood Forecast</h1>
+            <div ng-show="hourlyforecastsummary" class="alert alert-info alert-dismissable"><strong>Forecast:</strong><canvas id="currentweathericon" width="35" height="35"></canvas> {{hourlyforecastsummary}} ...<a ng-href="http://forecast.io/#/f/{{location[1]}},{{location[0]}}" target="_blank">forecast.io</a><button type="button" class="close" data-dismiss="alert">×</button></div>
             <div ng-show="altitude" class="alert alert-info">You are {{altitude}} high</div>
             
             <form ng-submit="saveUser()" id="frmUser">              
@@ -67,11 +68,27 @@
                   <button class="btn btn-default" type="submit" >{{signup}}</button>
                 </span>
               </div>
-            </form>
-            <br/>
+              <br/>
+            </form>            
 
             <div id="map"></div>
+            
+            <br/>
+            <div class="panel panel-warning">            
+              <div class="panel-body">
+                <img src="images/noaa_white.gif" width="33px"> <span class="badge"><strong>{{noaaAlerts.length}}</strong></span> NOAA Weather alerts for Colorado
+              </div>
+          </div>
 
+            <div class="panel panel-default" ng-repeat="alert in noaaAlerts">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{alert.title}}</h3>
+              </div>
+              <div class="panel-body">
+                {{alert.summary}} <a ng-href="{{alert.link}}" title="Read More" target="_blank">more...</a>
+              </div>
+            </div>
+            
         </div>
       </div>
     </div>
@@ -83,5 +100,6 @@
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/jquery.geolocation.js"></script>
+    <script type="text/javascript" src="js/skycons.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
 </html>

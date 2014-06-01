@@ -1,8 +1,8 @@
 angular.module('floodforecast', ['ngCookies']).
 
-controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
+controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
 
-  var graphic;
+  var usergraphic;
 
   $scope.map;
   //Boulder
@@ -22,8 +22,10 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
   $scope.hourlyforecastsummary;
   $scope.prev_address='';
 
-  require(["esri/symbols/SimpleMarkerSymbol", "dojo/_base/array", "dojo/string", "esri/tasks/QueryTask", "esri/tasks/query", "esri/map", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "dojo/domReady!"], 
-   function(SimpleMarkerSymbol, array, dojoString, QueryTask, Query, Map, ArcGISDynamicMapServiceLayer, FeatureLayer) { 
+  require(["esri/geometry/webMercatorUtils", "esri/geometry/Polygon", "esri/graphic", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/PictureMarkerSymbol", "dojo/_base/array", "dojo/string", "esri/tasks/QueryTask", "esri/tasks/query", "esri/map", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "dojo/domReady!"], 
+   
+   function(webMercatorUtils, Polygon, Graphic, SimpleMarkerSymbol, PictureMarkerSymbol, array, dojoString, QueryTask, Query, Map, ArcGISDynamicMapServiceLayer, FeatureLayer) { 
+   
     $scope.map = new Map("map", {
       center: $scope.location,
       zoom: 13,
@@ -73,7 +75,6 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
               // Loop through results and send text message
               array.forEach(results, function(entry, i){
 
-                console.log(entry);
                 // find closest DAC
                 findDAC(entry);
 
@@ -83,6 +84,8 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
           });
       });
     });
+
+
 
   
     function findDAC(userLocation) {
@@ -126,8 +129,34 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
       $scope.dac = "450 Power St, Erie CO 80516"
     }
 
+    function getNoaa(){
+    
+      $http.get('getNOAA.php').then(function(response){
 
-  });
+        $scope.noaaAlerts=response.data;
+
+        $.each(response.data,function(){
+
+          if(this.points && this.points.length!=0){
+            var points = [];
+
+            $.each(this.points,function(){
+              points.push([parseFloat(this[1]), parseFloat(this[0])]);
+            });
+            
+           var alertPoly = {"geometry":{"rings":[ points ],"spatialReference":{"wkid":4326}},"symbol":{"color":[0,0,0,64],"outline":{"color":[0,0,0,255],"width":1,"type":"esriSLS","style":"esriSLSSolid"},"type":"esriSFS","style":"esriSFSSolid"}};
+           var gra = new Graphic(alertPoly);
+           $scope.map.graphics.add(gra);
+
+          }
+        });       
+                  
+      });        
+  }
+  
+  getNoaa();
+
+  }); //end of esri
 
   function sendAlert() {
 
@@ -233,6 +262,9 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
     
   };
 
+  $scope.getWeatherIcon = function(){
+
+  }
   function geoCodeAddress(){
     
     var deferred = $q.defer();
@@ -251,14 +283,44 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
   }
 
   function getForecast(){
-    
+      
+      var skycons = new Skycons();          
+      skycons.add('logo', 'rain');  
+      skycons.play();
+
       $http.jsonp('https://api.forecast.io/forecast/e9c963d9b9cecdf941a11d1c2c46f4e5/'+$scope.location[1]+','+$scope.location[0]+'?callback=JSON_CALLBACK',{timeout: 10000}).then(function(response){
 
-        console.log(response.data);
-          figureForecast( response.data ); 
-                  
+            if(response.data){
+              
+              figureForecast( response.data ); 
+
+              if(response.data.hourly)
+                $scope.hourlyforecast = response.data.hourly.data;
+
+              if(response.data.hourly.summary)
+                $scope.hourlyforecastsummary = response.data.hourly.summary;
+
+              
+              skycons.add('currentweathericon', response.data.currently.icon);  
+              skycons.play();
+
+              $timeout(function(){
+                       
+                $.each($scope.hourlyforecast,function(){                
+                if(this.icon)
+                  skycons.add('w'+this.time, this.icon);
+                });
+                skycons.play();
+              },1500);
+            }
       });        
   }
+
+  $scope.getTime = function(time){
+      //time is epoch in seconds
+      //need milliseconds so * 1000
+      return $filter('date')(time*1000, 'h:mm a');
+  };
 
   function DateDiff(date1, date2) {
     return date1.getTime() - date2.getTime();
@@ -269,13 +331,8 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
     if(!data)
       return;
 
-    if(data.hourly)
-      $scope.hourlyforecast = data.hourly.data;
-
-    if(data.hourly.summary)
-      $scope.hourlyforecastsummary = data.hourly.summary;
-
     $.each(data.daily.data,function(){
+
       if(this.precipType && this.precipType=='rain'){
 
         scoreForecast(this.precipIntensity
@@ -307,15 +364,15 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
   function updateMap(){
 
     var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point($scope.location[0], $scope.location[1]));
-    if (!graphic) {
-      var symbol = new esri.symbol.PictureMarkerSymbol('images/bluedot.png', 40, 40);
-      graphic = new esri.Graphic(pt, symbol);
-      $scope.map.graphics.add(graphic);
-    }
-    else { //move the graphic if it already exists
-      graphic.setGeometry(pt);
-    }
-    $scope.map.centerAt(pt);
+        if (!usergraphic) {
+          var symbol = new esri.symbol.PictureMarkerSymbol('images/bluedot.png', 40, 40);
+          usergraphic = new esri.Graphic(pt, symbol);
+          $scope.map.graphics.add(usergraphic);
+        }
+        else { //move the graphic if it already exists
+          usergraphic.setGeometry(pt);
+        }
+        $scope.map.centerAt(pt);
   }
 
   function locateUser(){
