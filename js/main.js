@@ -1,6 +1,6 @@
-angular.module('floodforecast', []).
+angular.module('floodforecast', ['ngCookies']).
 
-controller('AppCtrl', function($scope,$http,$q,$sce) {
+controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
 
   var graphic;
 
@@ -67,16 +67,13 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
           });
       });
     });
-
-
-
   });
 
   function sendAlert(phoneNum) {
     $.ajax({
       type: "GET",
       url: 'sendAlert.php',
-      data: { 'phone': phoneNum },
+      data: { 'phone': $scope.phone },
       success: alert("sent")
     });
   }
@@ -111,47 +108,18 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
       $http.post('save.php', args).then(function(response){     
         if(response.data.addResults && response.data.addResults.length != 0){
           $scope.user_id = response.data.addResults[0].objectId;
-          $scope.signup = "Change Address";
-          $('.in-phone').addClass('hide');
-          $('.in-address').removeClass('hide').focus();
+          $scope.signup = "Thanks";     
+          $cookies.location = JSON.stringify($scope.location);
+          $cookies.phone = $scope.phone;     
+          $cookies.email = $scope.email;     
+          $cookies.address = $scope.address;  
+          $cookies.user_id = $scope.user_id;   
         }
       },function(){
         //failed posting
         $scope.signup = "Sign Up";
       });
-
-    } else if($scope.signup == "Change Address"){
-
-      $scope.signup = "Saving...";
-
-      geoCodeAddress().then(function(){
-        // success
-        var args = {"geometry":{"x":$scope.location[1],"y":$scope.location[0]},"attributes":{"phone":$scope.phone,"email":$scope.email}};
-
-        if($scope.user_id)
-          args.attributes.FID = $scope.user_id;
-
-        if($scope.address)
-          args.attributes.address = $scope.address;
-
-        $http.post('update.php', args).then(function(response){
-
-          if(response.data.addResults && response.data.addResults.length != 0){
-            $scope.user_id = response.data.addResults[0].objectId;
-            $scope.signup = "Sign Up";
-            $('.in-phone').removeClass('hide');
-            $('.in-address').addClass('hide');
-          }
-        },function(){
-          //failed posting
-          $scope.signup = "Change Address";
-        });
-
-      }, function(){
-        //invalid address
-      });
-      
-    }
+    } 
   };
 
   function geoCodeAddress(){
@@ -245,6 +213,16 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
     });
   }
 
-  locateUser();
+  if($cookies.location)
+    $scope.location = JSON.parse($cookies.location);
+  $scope.phone = $cookies.phone;     
+  $scope.email = $cookies.email;     
+  $scope.address = $cookies.address;    
+  $scope.user_id = $cookies.user_id;    
+
+  // if($scope.location)
+    locateUser();
+  // else
+  //   updateMap();
 
 });
