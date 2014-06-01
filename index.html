@@ -37,7 +37,7 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar first">
-            <li class="active"><a href="#">My Alerts <span class="label label-warning pull-right" style="color:#000000;"><strong>{{noaaAlerts.length}}</strong></span></a> </li>            
+            <li class="active"><a href="#alerts">My Alerts <span class="label label-warning pull-right" style="color:#000000;"><strong>{{noaaAlerts.length}}</strong></span></a> </li>            
           </ul>
           <ul class="nav nav-sidebar">
             <form ng-submit="saveUser()">
@@ -75,19 +75,22 @@
 
             <div id="map"></div>
             
+            <a name="alerts">&nbsp;</a>
             <br/>
             <div class="panel panel-warning">            
               <div class="panel-body">
                 <img src="images/noaa_white.gif" width="33px"> <span class="badge"><strong>{{noaaAlerts.length}}</strong></span> NOAA Weather alerts for Colorado
               </div>
           </div>
-
             <div class="panel panel-default" ng-repeat="alert in noaaAlerts">
               <div class="panel-heading">
-                <h3 class="panel-title">{{alert.title}}</h3>
+                <h3 class="panel-title">{{alert.title}}
+                  <div class="label label-noaa pull-right {{getNoaaAlertClass(alert.severity)}}">{{alert.severity}}</div>
+                </h3>
               </div>
               <div class="panel-body">
-                {{alert.summary}} <a ng-href="{{alert.link}}" title="Read More" target="_blank">more...</a>
+                {{alert.summary}} <a ng-href="{{alert.link}}" title="Read More" target="_blank">more...</a> 
+                <br/><strong>Areas affected:</strong> {{alert.areaDesc}}               
               </div>
             </div>
             

@@ -202,6 +202,19 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
     }    
   };
 
+  $scope.getNoaaAlertClass = function(severity){
+     switch(severity){
+      case 'Severe':
+        return 'label-danger';
+      case 'Moderate':
+        return 'label-warning';
+      case 'Minor':
+        return 'label-info';
+      default:
+        return 'label-success';      
+    }    
+  }; 
+
   $scope.saveUser = function(){ 
 
         if(!angular.equals($scope.prev_address,$scope.address)){
