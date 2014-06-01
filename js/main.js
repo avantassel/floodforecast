@@ -84,35 +84,35 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies) {
 
   
     function findDAC(userLocation) {
-      $scope.centres
-      userLocation
+      // $scope.centres
+      // userLocation
 
-      var params = new esri.tasks.ClosestFacilityParameters();
-      params.defaultCutoff = 3.0;
-      params.returnIncidents = false;
-      params.returnRoutes = false;
-      params.returnDirections = false;
-      // $scope.facilities.features[0].attributes = null;
-      array.forEach($scope.facilities.features, function(entry, i) {
-        entry.attributes = null
-      });
+      // var params = new esri.tasks.ClosestFacilityParameters();
+      // params.defaultCutoff = 3.0;
+      // params.returnIncidents = false;
+      // params.returnRoutes = false;
+      // params.returnDirections = false;
+      // // $scope.facilities.features[0].attributes = null;
+      // array.forEach($scope.facilities.features, function(entry, i) {
+      //   entry.attributes = null
+      // });
       
-      params.facilities = $scope.facilities; // needs to be a DataFile
+      // params.facilities = $scope.facilities; // needs to be a DataFile
       
 
-      // $scope.incidents = new esri.tasks.FeatureSet();
-      // $scope.incidents.features = userLocation;
-      // $scope.incidents.features = [$scope.incidents.features];
-      // $scope.incidents.features[0].attributes = null;
-      // $scope.incidents.geometry = $scope.incidents;
-      // params.incidents = $scope.incidents;
+      // // $scope.incidents = new esri.tasks.FeatureSet();
+      // // $scope.incidents.features = userLocation;
+      // // $scope.incidents.features = [$scope.incidents.features];
+      // // $scope.incidents.features[0].attributes = null;
+      // // $scope.incidents.geometry = $scope.incidents;
+      // // params.incidents = $scope.incidents;
 
-      var features = [];
-      userLocation.attributes = null;
-      features.push(userLocation);
-      var incidents = new FeatureSet();
-      incidents.features = features;
-      params.incidents = incidents;
+      // var features = [];
+      // userLocation.attributes = null;
+      // features.push(userLocation);
+      // var incidents = new FeatureSet();
+      // incidents.features = features;
+      // params.incidents = incidents;
 
       
       // This is broken. Need auth token and params.incidents isn't a valid location
