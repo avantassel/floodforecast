@@ -43,9 +43,9 @@
           </ul>
           <ul class="nav nav-sidebar">
             <form id="userInputForm" ng-submit="saveUser()">
-            <li><input type="phone" class="form-control in-side-phone" ng-model="phone" value="<?php echo $_GET['from']; ?>"></li>
+            <li><input type="phone" class="form-control in-side-phone" ng-model="phone" value="<?php echo $_GET['From']; ?>"></li>
             <li><input type="email" class="form-control in-side-email" placeholder="Email" ng-model="email"></li>
-            <li><input type="text" class="form-control in-side-address" ng-model="address" value="<?php echo $_GET['body']; ?>"></li>
+            <li><input type="text" class="form-control in-side-address" ng-model="address" value="<?php echo $_GET['Body']; ?>"></li>
             <li>
               <button class="btn btn-default" type="submit" >{{signup}}</button>
             </li>
