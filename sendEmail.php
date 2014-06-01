@@ -10,10 +10,9 @@ if(isset($_GET['to'])){
 	       setSubject('Your alerts are set')->
 	       setText("Thanks for setting up ALerts with Flood Forecast!\n\n\n")->
 	       setHtml('<h1>Thanks for setting up Alerts with Flood Forecast!</h1><br><br><p><a href="http://www.floodforecast.org">http://www.floodforecast.org</a></p>');	
-	$sendgrid->send($email);       
-	$return = array('message'=>'success')
+	$return = $sendgrid->send($email);       
 } else {
-	$return = array('message'=>'fail')
+	$return = array('message'=>'error');
 }
 
 header("Content-type: application/json");

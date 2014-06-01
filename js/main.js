@@ -79,7 +79,7 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
 
                 // find closest DAC
                 findDAC(entry);
-                
+
               });
           });
       });
@@ -221,6 +221,9 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
           });
         } else {
           $scope.updateUser();            
+        }
+        if($scope.phone && $scope.email && $scope.address){
+          $('#frmUser').hide();
         }
   };   
 
