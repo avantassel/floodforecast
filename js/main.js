@@ -27,11 +27,15 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
       basemap: "streets"
     });
 
-    
+    urlUtils.addProxyRule({
+      urlPrefix: "route.arcgis.com",  
+      proxyUrl: "http://floodforecast/PHP/proxy.php"
+    });
+
+
     $scope.flood = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/ArcGIS/rest/services/Dissolve%20Boulder%20floodplain/FeatureServer/0");
     $scope.centres = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/Evacuation_Centers/FeatureServer/0/", {
-      mode: FeatureLayer.MODE_SNAPSHOT,
-      outFields: ["*"]
+      mode: FeatureLayer.MODE_SNAPSHOT
     });
     // need to query the feature layer
 
@@ -81,44 +85,61 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
               array.forEach(results, function(entry, i){
                 console.log(entry);
                 // find closest DAC
-                findDAC(entry.geometry);
+                var dac = findDAC(entry);
 
                 // off for now
-                // sendAlert(entry.attributes.phone);
+                // sendAlert(entry.attributes.phone, dac);
               });
 
           });
       });
     });
+  
+    function findDAC(userLocation) {
+      $scope.centres
+      userLocation
 
+      var params = new esri.tasks.ClosestFacilityParameters();
+      params.defaultCutoff = 3.0;
+      params.returnIncidents = false;
+      params.returnRoutes = false;
+      params.returnDirections = false;
+      // $scope.facilities.features[0].attributes = null;
+      array.forEach($scope.facilities.features, function(entry, i) {
+        entry.attributes = null
+      });
+      
+      params.facilities = $scope.facilities; // needs to be a DataFile
+      
+
+      // $scope.incidents = new esri.tasks.FeatureSet();
+      // $scope.incidents.features = userLocation;
+      // $scope.incidents.features = [$scope.incidents.features];
+      // $scope.incidents.features[0].attributes = null;
+      // $scope.incidents.geometry = $scope.incidents;
+      // params.incidents = $scope.incidents;
+
+      var features = [];
+      userLocation.attributes = null;
+      features.push(userLocation);
+      var incidents = new FeatureSet();
+      incidents.features = features;
+      params.incidents = incidents;
+
+      
+      // This is broken. Need auth token and params.incidents isn't a valid location
+      // closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://route.arcgis.com/arcgis/rest/services/World/ClosestFacility/NAServer/ClosestFacility_World");
+
+      // closestFacilityTask.solve(params, function(solveResult){
+      //   console.log(solveResult);
+      // });
+      return "450 Power St, Erie CO 80516"
+    }
 
 
   });
 
-  function findDAC(userLocation) {
-    $scope.centres
-    userLocation
 
-    var params = new esri.tasks.ClosestFacilityParameters();
-    params.defaultCutoff = 3.0;
-    params.returnIncidents = false;
-    params.returnRoutes = true;
-    params.returnDirections = true;
-    params.facilities = $scope.facilities; // needs to be a DataFile
-    
-
-    $scope.incidents = new esri.tasks.FeatureSet();
-    $scope.incidents.features = userLocation;
-    params.incidents = $scope.incidents;
-
-    
-
-    closestFacilityTask = new esri.tasks.ClosestFacilityTask("http://route.arcgis.com/arcgis/rest/services/World/ClosestFacility/NAServer/ClosestFacility_World");
-
-    closestFacilityTask.solve(params, function(solveResult){
-      console.log(solveResult);
-    });
-  }
 
   function sendAlert(phoneNum) {
     $.ajax({
