@@ -20,7 +20,9 @@ body {
 /*
  * Global add-ons
  */
-
+.navbar-brand{
+  letter-spacing: 0.2em;
+}
 .sub-header {
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;

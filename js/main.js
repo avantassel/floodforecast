@@ -9,7 +9,7 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter,$l
 
   $scope.map;
   //Boulder
-  $scope.location = [-104.9847, 39.7392];
+  $scope.location = [-105.2797, 40.0176];
   $scope.badHouses = [];
 
   $scope.when = [];
