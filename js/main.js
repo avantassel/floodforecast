@@ -1,5 +1,7 @@
-angular.module('floodforecast', ['ngCookies']).
-
+angular.module('floodforecast', ['ngCookies','angular-loading-bar']).
+config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
+    cfpLoadingBarProvider.includeSpinner = false;
+  }]).
 controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
 
   var usergraphic;
@@ -154,7 +156,12 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
       });        
   }
   
-  getNoaa();
+  getNoaa();    
+
+  //load noaa every 5 min
+  $timeout(function(){
+    getNoaa();    
+  },3600000);
 
   }); //end of esri
 
@@ -374,6 +381,8 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
           usergraphic.setGeometry(pt);
         }
         $scope.map.centerAt(pt);
+
+        getForecast();
   }
 
   function locateUser(){
@@ -385,7 +394,6 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
 
       updateMap();
 
-      getForecast();  
     });
   }
 
