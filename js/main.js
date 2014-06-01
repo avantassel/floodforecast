@@ -285,7 +285,8 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
   function getForecast(){
       
       var skycons = new Skycons();          
-      skycons.add('logo', 'rain');  
+      skycons.add('logo', 'rain');
+      skycons.add('logo2', 'rain');  
       skycons.play();
 
       $http.jsonp('https://api.forecast.io/forecast/e9c963d9b9cecdf941a11d1c2c46f4e5/'+$scope.location[1]+','+$scope.location[0]+'?callback=JSON_CALLBACK',{timeout: 10000}).then(function(response){

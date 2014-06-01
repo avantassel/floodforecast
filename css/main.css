@@ -31,6 +31,29 @@ body {
  * Sidebar
  */
 
+.tag {
+  font-size: 18px;
+padding-left: 260px;
+letter-spacing: 0.9em;
+color: #df691a;
+}
+
+.navbar .container-fluid{
+  padding-top: 11px;
+}
+
+.navbar-header{
+  margin-top: -10px;  
+}
+.nav.nav-sidebar.first{
+  margin-top: -20px;
+}
+.page-header{
+  letter-spacing: 0.5em;  
+}
+.page-header .label {
+  padding-top: 10px;
+}
 /* Hide for mobile, show later */
 .sidebar {
   display: none;
