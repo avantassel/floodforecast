@@ -27,12 +27,7 @@ controller('AppCtrl', function($scope,$http,$q,$sce) {
       basemap: "streets"
     });
 
-    urlUtils.addProxyRule({
-      urlPrefix: "route.arcgis.com",  
-      proxyUrl: "/sproxy"
-    });
-
-
+    
     $scope.flood = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/ArcGIS/rest/services/Dissolve%20Boulder%20floodplain/FeatureServer/0");
     $scope.centres = new FeatureLayer("http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/Evacuation_Centers/FeatureServer/0/", {
       mode: FeatureLayer.MODE_SNAPSHOT,
