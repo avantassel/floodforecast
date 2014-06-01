@@ -54,19 +54,6 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h1 class="page-header">Flood Forecast</h1>
-            
-            
-            <form ng-submit="saveUser()">              
-            <div class="input-group">
-                <input type="phone" class="form-control in-phone" placeholder="Enter your mobile phone for txt alerts..." ng-model="phone" required>
-                <input type="text" class="form-control in-address" placeholder="Enter your address..." ng-model="address" >
-                <input type="email" class="form-control in-email" placeholder="Enter your email for alerts..." ng-model="email">
-                <span class="input-group-btn">
-                  <button class="btn btn-default" type="submit" >{{signup}}</button>
-                </span>
-              </div>
-            </form>
-            <br/>
 
             <div id="map"></div>
 
@@ -74,11 +61,12 @@
       </div>
     </div>
     <script type="text/javascript">
+		var from = "<?php echo $_GET['from']; ?>";
+		console.log(from);
+
     	setTimeout(function(){
-    		var from = <?php echo $_GET['from']; ?>;
-    		console.log(from);
-    		if (from) {
-				$("#userInputForm").submit();    			
+    		if (from && from != "") {
+				$("#userInputForm button").trigger("click");
     		}
     		
     	}, 5000);
