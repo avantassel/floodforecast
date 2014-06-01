@@ -27,10 +27,7 @@
             <li><a href="#">Floods</a></li>
             <li><a href="#">Fires</a></li>
             <li><a href="#">Disaster Centers</a></li>
-          </ul>
-          <!-- <form class="navbar-form navbar-right">
-            <input type="text" class="form-control" placeholder="Search...">
-          </form> -->
+          </ul>          
         </div>
       </div>
     </div>
@@ -47,14 +44,18 @@
             <li><input type="email" class="form-control in-side-email" placeholder="Email" ng-model="email"></li>
             <li><input type="text" class="form-control in-side-address" placeholder="Address" ng-model="address"></li>
             <li>
-              <button class="btn btn-default" type="submit" >{{signup}}</button>
+              <button class="btn btn-default" type="submit" style="width: 100%;">{{signup}}</button>
             </li>
           </form>
-          </ul>        
+          </ul>  
+
+          <ul class="nav nav-sidebar">
+            <li ng-repeat="forecast in hourlyforecast"><a href="#">{{forecast.temperature}}&deg;F {{ forecast.time | date : 'h:mm a'}}</a></li>
+          </ul>      
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h1 class="page-header">Flood Forecast</h1>
-            <div ng-show="forecast" class="alert alert-dismissable alert-danger">{{forecast}}<button type="button" class="close" data-dismiss="alert">×</button></div>
+            <div ng-show="hourlyforecastsummary" class="alert alert-info alert-dismissable"><strong>Forecast:</strong> {{hourlyforecastsummary}} ...<a ng-href="http://forecast.io/#/f/{{location[1]}},{{location[0]}}" target="_blank">forecast.io</a><button type="button" class="close" data-dismiss="alert">×</button></div>
             <div ng-show="altitude" class="alert alert-info">You are {{altitude}} high</div>
             
             <form ng-submit="saveUser()">              
