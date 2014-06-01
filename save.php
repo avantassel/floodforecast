@@ -1,13 +1,26 @@
 <?php
-require_once 'Zend/Oauth/Consumer.php';
+include 'vendor/autoload.php';
+
+use GuzzleHttp\Client;
+
+$client = new Client();
 
 $data_string = $HTTP_RAW_POST_DATA;
 
-$client = new Zend_Http_Client('http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/new_floody_houses/FeatureServer/0/addFeatures');
-$client->setParameterPost(array('f' => 'pjson'));
-$client->setParameterPost(array('features' => $data_string));
+$request = $client->createRequest('POST', 'http://services2.arcgis.com/XrTRbkeSS1aM6EfD/arcgis/rest/services/new_floody_houses/FeatureServer/0/addFeatures');
+$postBody = $request->getBody();
+$postBody->setField('f', 'pjson');
+$postBody->setField('features', $data_string);
+$response = $client->send($request);
 
-$response = $client->request(Zend_Http_Client::POST); 
+if(!empty($email)){
+	$email = new SendGrid\Email();
+	$email->addTo($email)->
+	       setFrom('me@floodforecast.org')->
+	       setSubject('Flood Forecast')->
+	       setText('Thanks for setting up ALerts with Flood Forecast!')->
+	       setHtml('<h1>Thanks for setting up ALerts with Flood Forecast!</h1>');
+}
 
 header("Content-type: application/json");
 echo $response->getBody();

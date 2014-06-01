@@ -1,5 +1,5 @@
 <?php
-require('Services/Twilio.php'); 
+include 'vendor/autoload.php';
  
 $account_sid = 'AC6f388ded21dbe579313fcaef8ffbcbbd'; 
 $auth_token = '54279ffb68816c143bb88ecb037b15d6'; 
