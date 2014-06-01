@@ -61,7 +61,7 @@
       </div>
     </div>
     <script type="text/javascript">
-		var from = "<?php echo $_GET['from']; ?>";
+		var from = "<?php echo $_GET['From']; ?>";
 		console.log(from);
 
     	setTimeout(function(){
