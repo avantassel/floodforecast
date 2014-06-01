@@ -58,6 +58,7 @@
           <h1 class="page-header"><label class="label label-warning pull-right"><canvas id="logo2" width="55" height="55"></canvas></label> Flood Forecast
             <div class="tag">Know when to get higher</div>
           </h1>
+          <p>Receive text and email alerts when you are in a flood area.</p>
             <div ng-show="hourlyforecastsummary" class="alert alert-info alert-dismissable"><strong>Forecast:</strong> <canvas id="currentweathericon" width="35" height="35"></canvas> {{hourlyforecastsummary}} ...<a ng-href="http://forecast.io/#/f/{{location[1]}},{{location[0]}}" target="_blank">forecast.io</a><button type="button" class="close" data-dismiss="alert">×</button></div>
             <div ng-show="altitude" class="alert alert-info">You are {{altitude}} high</div>
             
@@ -89,6 +90,7 @@
                 </h3>
               </div>
               <div class="panel-body">
+                <strong>{{alert.event}}</strong><br/>
                 {{alert.summary}} <a ng-href="{{alert.link}}" title="Read More" target="_blank">more...</a> 
                 <br/><strong>Areas affected:</strong> {{alert.areaDesc}}               
               </div>

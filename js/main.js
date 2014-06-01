@@ -79,9 +79,7 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter) {
 
                 // find closest DAC
                 findDAC(entry);
-
-                // off for now
-                // sendAlert();
+                
               });
           });
       });
