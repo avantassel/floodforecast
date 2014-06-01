@@ -92,6 +92,10 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter,$l
                   sendAlert(entry.attributes.phone);
                   note.html('Sending Alerts...'+entry.attributes.phone);
                 }
+                if(entry.attributes.email){
+                  console.log('Email alert sent to ',entry.attributes.email);
+                  sendEmail(entry.attributes.email);
+                }
               });
               note.html('Disaster Centers');
           });
@@ -188,14 +192,17 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter,$l
     });
   }
 
-  function sendEmail() {
+  function sendEmail(email) {
+
+     if(!email)
+      email=$scope.email;
 
     $.ajax({
       type: "GET",
       url: 'sendEmail.php',
-      data: { 'to': $scope.email },
+      data: { 'to': email },
       success: function(){
-       console.log('sendEmail','Email sent to '+$scope.email) 
+       console.log('sendEmail','Email sent to '+email) 
       }
     });
   }

@@ -8,8 +8,8 @@ if(isset($_GET['to'])){
 	       setFrom('alerts@floodforecast.org')->
 	       setFromName('Flood Forecast Alerts')->
 	       setSubject('Your alerts are set')->
-	       setText("Thanks for setting up ALerts with Flood Forecast!\n\n\n")->
-	       setHtml('<h1>Thanks for setting up Alerts with Flood Forecast!</h1><br><br><p><a href="http://www.floodforecast.org">http://www.floodforecast.org</a></p>');	
+	       setText("FloodForecast says: Flooding near you, move to higher ground. Nearest evacuation center: 450 Powers St, Erie, CO. http://bit.ly/1kYEOW8")->
+	       setHtml("FloodForecast says: Flooding near you, move to higher ground. Nearest evacuation center: 450 Powers St, Erie, CO. http://bit.ly/1kYEOW8");	
 	$return = $sendgrid->send($email);       
 } else {
 	$return = array('message'=>'error');

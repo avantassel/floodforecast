@@ -60,7 +60,7 @@
           </h1>
           <p>Receive text and email alerts when you are in a flood area.  Dark Blue outlines are FEMA flood zones.  Light Polygons are current NOAA weather alerts.</p>
             <div ng-show="hourlyforecastsummary" class="alert alert-info alert-dismissable"><strong>Forecast:</strong> <canvas id="currentweathericon" width="35" height="35"></canvas> {{hourlyforecastsummary}} ...<a ng-href="http://forecast.io/#/f/{{location[1]}},{{location[0]}}" target="_blank">forecast.io</a><button type="button" class="close" data-dismiss="alert">×</button></div>
-            <div ng-show="altitude" class="alert alert-info">You are {{altitude}} high</div>
+            <!-- <div ng-show="altitude" class="alert alert-info">You are {{altitude}} high</div> -->
             
             <form ng-submit="saveUser()" id="frmUser">              
             <div class="input-group">
