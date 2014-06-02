@@ -66,6 +66,9 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter,$l
 
     $scope.sendAlerts = function(e){
 
+      //this was for demo, needs to be moved to a backend process, cron job
+      return;
+
       var note = $(e.target);
       note.html('Sending Alerts...');
       // get the polygon feature
@@ -251,6 +254,9 @@ controller('AppCtrl', function($scope,$http,$q,$sce,$cookies,$timeout,$filter,$l
       
       $scope.signup = "Saving...";
 
+      //can probably use esri to do this,
+      //var pt = esri.geometry.geographicToWebMercator(new esri.geometry.Point($scope.location[0], $scope.location[1]));
+      //
       var mll = llToMercator($scope.location[1],$scope.location[0]);
       var args = {"geometry":{"x":mll[0],"y":mll[1]},"attributes":{"phone":$scope.phone,"email":$scope.email,"address":$scope.address}};
       var save_url = 'save.php';
